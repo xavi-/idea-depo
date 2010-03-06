@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>hexlib test</title>
+	<link rel="stylesheet" type="text/css" media="all" href="qunit/qunit.css">
+</head>
+<body class="flora">
+	<h1 id="qunit-header">hexlib test suite</h1>
+	<h2 id="qunit-banner"></h2>
+	<div id="qunit-testrunner-toolbar"></div>
+	<h2 id="qunit-userAgent"></h2>
+	<ol id="qunit-tests"></ol>
+<script type="text/javascript" src="../operational-transforms.js"></script>
+<script type="text/javascript" src="qunit/qunit.js"></script>
+<script type="text/javascript">
+    test("applying operations", function() {
+        equals(ot.applyOps("is a test", [ { cmd: "ins", pos: 0, val: "this " } ]),
+               "this is a test",
+               "Insert at the beginning");
+
+        equals(ot.applyOps("this is a", [ { cmd: "ins", pos: 10, val: " test" } ]),
+               "this is a test",
+               "Insert at the end");
+
+        equals(ot.applyOps("this a test", [ { cmd: "ins", pos: 5, val: "is " } ]),
+               "this is a test",
+               "Insert in the middle");
+
+        equals(ot.applyOps("0123456789", [ { cmd: "del", pos: 0 } ]),
+               "123456789",
+               "Delete at the beginning");
+
+        equals(ot.applyOps("0123456789", [ { cmd: "del", pos: 9 } ]),
+               "012345678",
+               "Delete at the end");
+
+        equals(ot.applyOps("0123456789", [ { cmd: "del", pos: 5 } ]),
+               "012346789",
+               "Delete at the beginning");
+
+        equals(ot.applyOps("3459", [ { cmd: "ins", pos: 0, val: "012" }, { cmd: "ins", pos: 3, val: "678" } ]),
+               "0123456789",
+               "Multiple inserts: beginning, middle");
+
+        equals(ot.applyOps("0126", [ { cmd: "ins", pos: 3, val: "345" }, { cmd: "ins", pos: 4, val: "789" } ]),
+               "0123456789",
+               "Multiple inserts: beginning, middle");
+
+        equals(ot.applyOps("ab0123456789", [ { cmd: "del", pos: 0 }, { cmd: "del", pos: 1 } ]),
+               "0123456789",
+               "Multiple deletes: beginning, beginning");
+
+        equals(ot.applyOps("0123456789yz", [ { cmd: "del", pos: 10 }, { cmd: "del", pos: 11 } ]),
+               "0123456789",
+               "Multiple deletes: end, end");
+
+        equals(ot.applyOps("01a456789", [ { cmd: "del", pos: 2 }, { cmd: "ins", pos: 2, val: "23" } ]),
+               "0123456789",
+               "Inserts and deletes: middle, middle");
+    });
+</script>
+</body>
+</html>
