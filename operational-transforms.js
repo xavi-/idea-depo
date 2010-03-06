@@ -1,5 +1,5 @@
 (function(ot) {
-    function opsSorter(a, b) {
+    function opsCompare(a, b) {
         if(a.pos === b.pos) { return (a.cmd === "ins") ? -1 : 1; }
         return a.pos - b.pos; 
     }
@@ -9,7 +9,7 @@
      *   [ { cmd: "ins", pos: <number>, val: <val> }, { cmd: "del", pos: <number> } ... ]
      */
     function combine(opsA, opsB) {
-        return opsA.concat(opsB).sort(opsSorter);
+        return opsA.concat(opsB).sort(opsCompare);
     }
     
     function transform(opsA, opsB) {
@@ -38,7 +38,7 @@
     
     function applyOps(text, ops) {
         var newText = text;
-        ops.sort(opsSorter).reverse().forEach(function(o) { // Replace with fold operation?
+        ops.sort(opsCompare).reverse().forEach(function(o) { // Replace with fold operation?
             if(o.cmd === "del") {
                 newText = newText.substr(0, o.pos) + newText.substr(o.pos + 1);
             } else if(o.cmd === "ins") {
