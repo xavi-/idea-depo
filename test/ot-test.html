@@ -59,6 +59,24 @@
                "0123456789",
                "Inserts and deletes: middle, middle");
     });
+    
+    test("combine operations", function() {
+        same(ot.combine([ { cmd: "ins", pos: 3, val: "woop" }, { cmd: "del", pos: 7 } ],
+                        [ { cmd: "del", pos: 1 }, { cmd: "ins", pos: 5, val: "woop" } ]),
+             [ { cmd: "del", pos: 1 },
+               { cmd: "ins", pos: 3, val: "woop" }, 
+               { cmd: "ins", pos: 5, val: "woop" },
+               { cmd: "del", pos: 7 } ],
+             "Basic combine test");
+        
+        same(ot.combine([ { cmd: "ins", pos: 3, val: "woop" }, { cmd: "del", pos: 5 } ],
+                        [ { cmd: "del", pos: 4 }, { cmd: "ins", pos: 5, val: "woop" } ]),
+             [ { cmd: "ins", pos: 3, val: "woop" },
+               { cmd: "del", pos: 4 },
+               { cmd: "ins", pos: 5, val: "woop" },
+               { cmd: "del", pos: 5 } ],
+             "Edge case combine test");
+    });
 </script>
 </body>
 </html>
