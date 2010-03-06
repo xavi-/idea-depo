@@ -11,9 +11,11 @@
 	<div id="qunit-testrunner-toolbar"></div>
 	<h2 id="qunit-userAgent"></h2>
 	<ol id="qunit-tests"></ol>
+    
 <script type="text/javascript" src="../operational-transforms.js"></script>
 <script type="text/javascript" src="qunit/qunit.js"></script>
 <script type="text/javascript">
+    var undefined;
     test("applying operations", function() {
         equals(ot.applyOps("is a test", [ { cmd: "ins", pos: 0, val: "this " } ]),
                "this is a test",
@@ -58,6 +60,23 @@
         equals(ot.applyOps("01a456789", [ { cmd: "del", pos: 2 }, { cmd: "ins", pos: 2, val: "23" } ]),
                "0123456789",
                "Inserts and deletes: middle, middle");
+    });
+    
+    test("transform operations", function() {
+        same(ot.transform([ { cmd: "ins", pos: 3, val: "woop" }, { cmd: "del", pos: 7 } ],
+                          [ { cmd: "del", pos: 1 }, { cmd: "ins", pos: 5, val: "woop" } ]),
+             [ { cmd: "del", pos: 1, val: undefined }, { cmd: "ins", pos: 9, val: "woop" } ],
+             "Basic transform test");
+        
+        same(ot.transform([ { cmd: "ins", pos: 3, val: "woop" }, { cmd: "del", pos: 5 } ],
+                          [ { cmd: "del", pos: 4 }, { cmd: "ins", pos: 5, val: "woop" } ]),
+             [ { cmd: "del", pos: 8, val: undefined }, { cmd: "ins", pos: 9, val: "woop" } ],
+             "Edge case transform test");
+        
+        same(ot.transform([ { cmd: "del", pos: 2 }, { cmd: "ins", pos: 5, val: "woop" } ],
+                          [ { cmd: "ins", pos: 3, val: "woop" }, { cmd: "del", pos: 5 } ]),
+             [ { cmd: "ins", pos: 2, val: "woop" }, { cmd: "del", pos: 8, val: undefined } ],
+             "Edge case transform test");
     });
     
     test("combine operations", function() {
