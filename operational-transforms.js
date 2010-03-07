@@ -49,7 +49,67 @@
         return newText;
     }
     
+    var produceOp = (function() {
+        function lcs(textA, textB) { // TODO: improve performance with dynamic version of algorithm or memoization
+            if(textA === "" || textB === "") { return ""; }
+            else if(textA[0] === textB[0]) { return textA[0] + lcs(textA.substr(1), textB.substr(1)); }
+            else {
+                var ans1 = lcs(textA, textB.substr(1));
+                var ans2 = lcs(textA.substr(1), textB);
+                
+                return (ans1.length > ans2.length ? ans1 : ans2);
+            }
+        }
+    
+        function trim(textA, textB) {
+            for(var i = 0, l = Math.min(textA.length, textB.length); i < l; i++) {
+                if(textA.charAt(i) !== textB.charAt(i)) { break; }
+            }
+            
+            for(var j = 1, l = Math.min(textA.length, textB.length); j <= l - i; j++) {
+                if(textA.charAt(textA.length - j) !== textB.charAt(textB.length - j)) { break; }
+            }
+            
+            return { frontOffset: i, backOffset: j, 
+                     A: textA.substring(i, textA.length - j + 1), B: textB.substring(i, textB.length - j + 1) };
+        }
+        
+        function produceOp(oriText, newText) {
+            var trm = trim(oriText, newText);
+            
+            if(trm.A === "" && trm.B === "") { return []; }
+            else if(trm.A === "") { return [ { cmd: "ins", pos: trm.frontOffset, val: trm.B } ]; }
+            else if(trm.B === "") {
+                var ops = [];
+                
+                for(var i = 0; i < trm.A.length; i++) { ops.push({ cmd: "del", pos: trm.frontOffset + i }); }
+                
+                return ops; 
+            } else {
+                var common = lcs(trm.A, trm.B), ops = [];
+                
+                for(var i = 0, o = 0, n = 0; i < common.length; i++) {
+                    while(trm.A.charAt(o++) !== common.charAt(i)) {
+                        ops.push({ cmd: "del", pos: trm.frontOffset + o - 1 });
+                    }
+                    
+                    while(trm.B.charAt(n++) !== common.charAt(i)) {
+                        ops.push({ cmd: "ins", pos: trm.frontOffset + o - 1, val: trm.B.charAt(n - 1) }); 
+                    }
+                }
+                
+                while(o++ < trm.A.length) { ops.push({ cmd: "del", pos: trm.frontOffset + o - 1}); }
+                if(n < trm.B.length) { ops.push({ cmd: "ins", pos: trm.frontOffset + o - 1, val: trm.B.substr(n) }); }
+                
+                return ops;
+            }
+        }
+        
+        return produceOp;
+    })();
+    
     ot.combine = combine;
     ot.transform = transform;
     ot.applyOp = applyOp;
+    ot.produceOp = produceOp;
 })(typeof exports === "object" ? exports : (window.ot = {}));
