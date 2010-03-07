@@ -96,6 +96,49 @@
                { cmd: "del", pos: 5 } ],
              "Edge case combine test");
     });
+    
+    test("producing operations: simple tests", function() {
+        same(ot.produceOp("hello", "helloo"), [ { cmd: "ins", pos: 5, val: "o" } ], "Insert at end diff");
+        
+        same(ot.produceOp("helloo", "hello"), [ { cmd: "del", pos: 5 } ], "Delete at end diff");
+        
+        same(ot.produceOp("hello", "ahello"), [ { cmd: "ins", pos: 0, val: "a" } ], "Insert at begin diff");
+        
+        same(ot.produceOp("ahello", "hello"), [ { cmd: "del", pos: 0 } ], "Delete at begin diff");
+        
+        same(ot.produceOp("hello", "helkaklo"), [ { cmd: "ins", pos: 3, val: "kak" } ], "Insert at begin middle");
+        
+        same(ot.produceOp("helklo", "hello"), [ { cmd: "del", pos: 3 } ], "Delete at begin middle");
+    });
+    
+    test("producing and apply operations: complex tests", function() {
+        var ops;
+        
+        ops = ot.produceOp("human", "chimpanzee");
+        equals(ot.applyOp("human", ops), "chimpanzee");
+        
+        ops = ot.produceOp("chimpanzee", "human");
+        equals(ot.applyOp("chimpanzee", ops), "human");
+        
+        ops = ot.produceOp("a human face", "humane");
+        equals(ot.applyOp("a human face", ops), "humane");
+        
+        ops = ot.produceOp("humane", "a human face");
+        equals(ot.applyOp("humane", ops), "a human face");
+        
+        ops = ot.produceOp("huweean face", "human face");
+        equals(ot.applyOp("huweean face", ops), "human face");
+        
+        ops = ot.produceOp("human face", "huweean face");
+        equals(ot.applyOp("human face", ops), "huweean face");
+        
+        ops = ot.produceOp("a real m face", "a real human face");
+        equals(ot.applyOp("a real m face", ops), "a real human face");
+        
+        ops = ot.produceOp("a real human face", "a real m face");
+        equals(ot.applyOp("a real human face", ops), "a real m face");
+        
+    });
 </script>
 </body>
 </html>
