@@ -36,7 +36,7 @@
         return opsB_.filter(function(o) { return !!o.cmd; });
     }
     
-    function applyOps(text, ops) {
+    function applyOp(text, ops) {
         var newText = text;
         ops.sort(opsCompare).reverse().forEach(function(o) { // Replace with fold operation?
             if(o.cmd === "del") {
@@ -51,5 +51,5 @@
     
     ot.combine = combine;
     ot.transform = transform;
-    ot.applyOps = applyOps;
+    ot.applyOp = applyOp;
 })(typeof exports === "object" ? exports : (window.ot = {}));

@@ -17,47 +17,47 @@
 <script type="text/javascript">
     var undefined;
     test("applying operations", function() {
-        equals(ot.applyOps("is a test", [ { cmd: "ins", pos: 0, val: "this " } ]),
+        equals(ot.applyOp("is a test", [ { cmd: "ins", pos: 0, val: "this " } ]),
                "this is a test",
                "Insert at the beginning");
 
-        equals(ot.applyOps("this is a", [ { cmd: "ins", pos: 10, val: " test" } ]),
+        equals(ot.applyOp("this is a", [ { cmd: "ins", pos: 10, val: " test" } ]),
                "this is a test",
                "Insert at the end");
 
-        equals(ot.applyOps("this a test", [ { cmd: "ins", pos: 5, val: "is " } ]),
+        equals(ot.applyOp("this a test", [ { cmd: "ins", pos: 5, val: "is " } ]),
                "this is a test",
                "Insert in the middle");
 
-        equals(ot.applyOps("0123456789", [ { cmd: "del", pos: 0 } ]),
+        equals(ot.applyOp("0123456789", [ { cmd: "del", pos: 0 } ]),
                "123456789",
                "Delete at the beginning");
 
-        equals(ot.applyOps("0123456789", [ { cmd: "del", pos: 9 } ]),
+        equals(ot.applyOp("0123456789", [ { cmd: "del", pos: 9 } ]),
                "012345678",
                "Delete at the end");
 
-        equals(ot.applyOps("0123456789", [ { cmd: "del", pos: 5 } ]),
+        equals(ot.applyOp("0123456789", [ { cmd: "del", pos: 5 } ]),
                "012346789",
                "Delete at the beginning");
 
-        equals(ot.applyOps("3459", [ { cmd: "ins", pos: 0, val: "012" }, { cmd: "ins", pos: 3, val: "678" } ]),
+        equals(ot.applyOp("3459", [ { cmd: "ins", pos: 0, val: "012" }, { cmd: "ins", pos: 3, val: "678" } ]),
                "0123456789",
                "Multiple inserts: beginning, middle");
 
-        equals(ot.applyOps("0126", [ { cmd: "ins", pos: 3, val: "345" }, { cmd: "ins", pos: 4, val: "789" } ]),
+        equals(ot.applyOp("0126", [ { cmd: "ins", pos: 3, val: "345" }, { cmd: "ins", pos: 4, val: "789" } ]),
                "0123456789",
                "Multiple inserts: beginning, middle");
 
-        equals(ot.applyOps("ab0123456789", [ { cmd: "del", pos: 0 }, { cmd: "del", pos: 1 } ]),
+        equals(ot.applyOp("ab0123456789", [ { cmd: "del", pos: 0 }, { cmd: "del", pos: 1 } ]),
                "0123456789",
                "Multiple deletes: beginning, beginning");
 
-        equals(ot.applyOps("0123456789yz", [ { cmd: "del", pos: 10 }, { cmd: "del", pos: 11 } ]),
+        equals(ot.applyOp("0123456789yz", [ { cmd: "del", pos: 10 }, { cmd: "del", pos: 11 } ]),
                "0123456789",
                "Multiple deletes: end, end");
 
-        equals(ot.applyOps("01a456789", [ { cmd: "del", pos: 2 }, { cmd: "ins", pos: 2, val: "23" } ]),
+        equals(ot.applyOp("01a456789", [ { cmd: "del", pos: 2 }, { cmd: "ins", pos: 2, val: "23" } ]),
                "0123456789",
                "Inserts and deletes: middle, middle");
     });
