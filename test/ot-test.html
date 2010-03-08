@@ -95,6 +95,21 @@
                { cmd: "ins", pos: 5, val: "woop" },
                { cmd: "del", pos: 5 } ],
              "Edge case combine test");
+        
+        same(ot.combine([ { cmd: "ins", pos: 3, val: "woop" }, { cmd: "del", pos: 5 } ],
+                        [ { cmd: "ins", pos: 3, val: "ie" }, { cmd: "ins", pos: 5, val: "woop" } ]),
+             [ { cmd: "ins", pos: 3, val: "woopie" },
+               { cmd: "ins", pos: 5, val: "woop" },
+               { cmd: "del", pos: 5 } ],
+             "Edge case combine test: combine ins correctly");
+             
+             
+        same(ot.combine([ { cmd: "del", pos: 3 }, { cmd: "del", pos: 5 } ],
+                        [ { cmd: "del", pos: 3 }, { cmd: "ins", pos: 5, val: "woop" } ]),
+             [ { cmd: "del", pos: 3 },
+               { cmd: "ins", pos: 5, val: "woop" },
+               { cmd: "del", pos: 5 } ],
+             "Edge case combine test: combine del correctly");
     });
     
     test("producing operations: simple tests", function() {

@@ -8,8 +8,25 @@
      * Both opsA ad opsB are arries of this form:
      *   [ { cmd: "ins", pos: <number>, val: <val> }, { cmd: "del", pos: <number> } ... ]
      */
-    function combine(opsA, opsB) {
-        return opsA.concat(opsB).sort(opsCompare);
+    function combine(opA, opB) {
+        var a = 0, b = 0, opC = [];
+        
+        while(a < opA.length && b < opB.length) {
+            if(opA[a].pos < opB[b].pos) { opC.push(opA[a++]); }
+            else if(opB[b].pos < opA[a].pos) { opC.push(opB[b++]); }
+            else if(opA[a].cmd !== opB[b].cmd) {
+                if(opA[a].cmd === "ins") { opC.push(opA[a++]); }
+                else { opC.push(opB[b++]); }
+            } else { // opA and opB same pos and same cmd
+                if(opA[a].cmd === "del") { opC.push(opB[b++]); a++; }
+                else { opC.push({ cmd: "ins", pos: opB[b].pos, val: opA[a++].val + opB[b++].val }); }
+            }
+        }
+        
+        while(a < opA.length) { opC.push(opA[a++]); }
+        while(b < opB.length) { opC.push(opB[b++]); }
+        
+        return opC;
     }
     
     function transform(opsA, opsB) {
