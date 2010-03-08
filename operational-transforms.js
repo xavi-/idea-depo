@@ -101,6 +101,17 @@
                 while(o++ < trm.A.length) { ops.push({ cmd: "del", pos: trm.frontOffset + o - 1}); }
                 if(n < trm.B.length) { ops.push({ cmd: "ins", pos: trm.frontOffset + o - 1, val: trm.B.substr(n) }); }
                 
+                for(var i = 0; i < ops.length - 1; i++) { // Combine ins's at same pos into one op
+                    if(ops[i].cmd !== "ins") { continue; }
+                    
+                    if(ops[i + 1].cmd !== "ins") { continue; }
+                    
+                    if(ops[i].pos !== ops[i + 1].pos) { continue; }
+                    
+                    ops[i].val += ops[i + 1].val;
+                    ops.splice(i + 1, 1); i--;
+                }
+                
                 return ops;
             }
         }
