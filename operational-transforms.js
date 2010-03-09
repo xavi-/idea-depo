@@ -8,30 +8,30 @@
      * Both opsA ad opsB are arries of this form:
      *   [ { cmd: "ins", pos: <number>, val: <val> }, { cmd: "del", pos: <number> } ... ]
      */
-    function combine(opA, opB) {
+    function combine(opsA, opsB) {
         var a = 0, b = 0, opC = [];
         
-        opB = opB.map(function(o) { return { cmd: o.cmd, pos: o.pos, val: o.val }; });
-        opA.forEach(function(a) { // Compensatings for the affects of opA on opB
-            opB.forEach(function(b) { // Compensative changes opB_ for
+        opsB = opsB.map(function(o) { return { cmd: o.cmd, pos: o.pos, val: o.val }; });
+        opsA.forEach(function(a) { // Compensatings for the affects of opsA on opsB
+            opsB.forEach(function(b) { // Compensative changes opsB_ for
                 if(a.pos <= b.pos) { b.pos += (a.cmd === "ins" ? -a.val.length : 1); }
             });
         });
         
-        while(a < opA.length && b < opB.length) {
-            if(opA[a].pos < opB[b].pos) { opC.push(opA[a++]); }
-            else if(opB[b].pos < opA[a].pos) { opC.push(opB[b++]); }
-            else if(opA[a].cmd !== opB[b].cmd) {
-                if(opA[a].cmd === "ins") { opC.push(opA[a++]); }
-                else { opC.push(opB[b++]); }
-            } else { // opA and opB same pos and same cmd
-                if(opA[a].cmd === "del") { opC.push(opB[b++]); a++; }
-                else { opC.push({ cmd: "ins", pos: opB[b].pos, val: opA[a++].val + opB[b++].val }); }
+        while(a < opsA.length && b < opsB.length) {
+            if(opsA[a].pos < opsB[b].pos) { opC.push(opsA[a++]); }
+            else if(opsB[b].pos < opsA[a].pos) { opC.push(opsB[b++]); }
+            else if(opsA[a].cmd !== opsB[b].cmd) {
+                if(opsA[a].cmd === "ins") { opC.push(opsA[a++]); }
+                else { opC.push(opsB[b++]); }
+            } else { // opsA and opsB same pos and same cmd
+                if(opsA[a].cmd === "del") { opC.push(opsB[b++]); a++; }
+                else { opC.push({ cmd: "ins", pos: opsB[b].pos, val: opsA[a++].val + opsB[b++].val }); }
             }
         }
         
-        while(a < opA.length) { opC.push(opA[a++]); }
-        while(b < opB.length) { opC.push(opB[b++]); }
+        while(a < opsA.length) { opC.push(opsA[a++]); }
+        while(b < opsB.length) { opC.push(opsB[b++]); }
         
         return opC;
     }

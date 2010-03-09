@@ -94,27 +94,27 @@
     });
     
     test("combine operations integrated tests", function() {
-        var opA, opB;
+        var opsA, opsB;
         
-        opA = ot.produceOp("hi", "hid");
-        opB = ot.produceOp("hid", "hide");
-        same(ot.combine(opA, opB), ot.produceOp("hi", "hide"), "combining ins's");
+        opsA = ot.produceOp("hi", "hid");
+        opsB = ot.produceOp("hid", "hide");
+        same(ot.combine(opsA, opsB), ot.produceOp("hi", "hide"), "combining ins's");
         
-        opA = ot.produceOp("mars", "the mars");
-        opB = ot.produceOp("the mars", "the planet mars");
-        same(ot.combine(opA, opB), ot.produceOp("mars", "the planet mars"), "combining ins's");
+        opsA = ot.produceOp("mars", "the mars");
+        opsB = ot.produceOp("the mars", "the planet mars");
+        same(ot.combine(opsA, opsB), ot.produceOp("mars", "the planet mars"), "combining ins's");
         
-        opA = ot.produceOp("the planet mars", "the mars");
-        opB = ot.produceOp("the mars", "mars");
-        same(ot.combine(opA, opB), ot.produceOp("the planet mars", "mars"), "combining del's");
+        opsA = ot.produceOp("the planet mars", "the mars");
+        opsB = ot.produceOp("the mars", "mars");
+        same(ot.combine(opsA, opsB), ot.produceOp("the planet mars", "mars"), "combining del's");
         
-        opA = ot.produceOp("the planet mars", "the pluto");
-        opB = ot.produceOp("the pluto", "pluto");
-        same(ot.combine(opA, opB), ot.produceOp("the planet mars", "pluto"), "combining ins's and del's");
+        opsA = ot.produceOp("the planet mars", "the pluto");
+        opsB = ot.produceOp("the pluto", "pluto");
+        same(ot.combine(opsA, opsB), ot.produceOp("the planet mars", "pluto"), "combining ins's and del's");
         
-        opA = ot.produceOp("the planet mars", "the place pluto");
-        opB = ot.produceOp("the place pluto", "the palace pluto");
-        same(ot.combine(opA, opB), ot.produceOp("the planet mars", "the palace pluto"), "combining ins's and del's");
+        opsA = ot.produceOp("the planet mars", "the place pluto");
+        opsB = ot.produceOp("the place pluto", "the palace pluto");
+        same(ot.combine(opsA, opsB), ot.produceOp("the planet mars", "the palace pluto"), "combining ins's and del's");
     });
     
     test("producing and apply operations: complex tests", function() {
@@ -147,25 +147,23 @@
     });
     
     test("full integration tests", function() {
-        var opA, opB;
+        var opsA, opsB;
         
-        opA = ot.produceOp("human", "human face");
-        opB = ot.produceOp("human", "a human");
-        equals(ot.applyOp(ot.applyOp("human", opA), ot.transform(opA, opB)), "a human face");
-        equals(ot.applyOp(ot.applyOp("human", opB), ot.transform(opB, opA)), "a human face");
+        opsA = ot.produceOp("human", "human face");
+        opsB = ot.produceOp("human", "a human");
+        equals(ot.applyOp(ot.applyOp("human", opsA), ot.transform(opsA, opsB)), "a human face");
+        equals(ot.applyOp(ot.applyOp("human", opsB), ot.transform(opsB, opsA)), "a human face");
         
-        opA = ot.produceOp("I ran", "I run");
-        opB = ot.produceOp("I ran", "I had a ran");
-        equals(ot.applyOp(ot.applyOp("I ran", opA), ot.transform(opA, opB)), "I had a run");
-        equals(ot.applyOp(ot.applyOp("I ran", opB), ot.transform(opB, opA)), "I had a run");
+        opsA = ot.produceOp("I ran", "I run");
+        opsB = ot.produceOp("I ran", "I had a ran");
+        equals(ot.applyOp(ot.applyOp("I ran", opsA), ot.transform(opsA, opsB)), "I had a run");
+        equals(ot.applyOp(ot.applyOp("I ran", opsB), ot.transform(opsB, opsA)), "I had a run");
         
-        opA = ot.combine(ot.produceOp("012", "01234"), ot.produceOp("01234", "-2-1012345"));
-        opB = ot.produceOp("012", "0126789");
-        equals(ot.applyOp("012", opA), "-2-1012345");
-        equals(ot.applyOp(ot.applyOp("012", opA), ot.transform(opA, opB)), "-2-10123456789");
-        equals(ot.applyOp(ot.applyOp("012", opB), ot.transform(opB, opA)), "-2-10123456789");
-        operA = opA;
-        operB = opB;
+        opsA = ot.combine(ot.produceOp("012", "01234"), ot.produceOp("01234", "-2-1012345"));
+        opsB = ot.produceOp("012", "0126789");
+        equals(ot.applyOp("012", opsA), "-2-1012345");
+        equals(ot.applyOp(ot.applyOp("012", opsA), ot.transform(opsA, opsB)), "-2-10123456789");
+        equals(ot.applyOp(ot.applyOp("012", opsB), ot.transform(opsB, opsA)), "-2-10123456789");
     });
 </script>
 </body>
