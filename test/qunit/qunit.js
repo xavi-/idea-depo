@@ -842,7 +842,9 @@ QUnit.equiv = function () {
                         if(parents[j] === a[i])
                             loop = true; //don't go down the same path twice
                     }
-                    aProperties.push(i); // collect a's properties
+                    
+                    // ignore properties that are marked as undefined
+                    if(typeof a[i] !== "undefined") { aProperties.push(i); }
 
                     if (!loop && ! innerEquiv(a[i], b[i])) {
                         eq = false;
@@ -854,7 +856,7 @@ QUnit.equiv = function () {
                 parents.pop();
 
                 for (i in b) {
-                    bProperties.push(i); // collect b's properties
+                    if(typeof b[i] !== "undefined") { bProperties.push(i); } // collect b's properties
                 }
 
                 // Ensures identical properties name

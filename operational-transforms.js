@@ -11,6 +11,13 @@
     function combine(opA, opB) {
         var a = 0, b = 0, opC = [];
         
+        opB = opB.map(function(o) { return { cmd: o.cmd, pos: o.pos, val: o.val }; });
+        opA.forEach(function(a) { // Compensatings for the affects of opA on opB
+            opB.forEach(function(b) { // Compensative changes opB_ for
+                if(a.pos <= b.pos) { b.pos += (a.cmd === "ins" ? -a.val.length : 1); }
+            });
+        });
+        
         while(a < opA.length && b < opB.length) {
             if(opA[a].pos < opB[b].pos) { opC.push(opA[a++]); }
             else if(opB[b].pos < opA[a].pos) { opC.push(opB[b++]); }
@@ -32,7 +39,7 @@
     function transform(opsA, opsB) {
         var opsB_ = opsB.map(function(o) { return { cmd: o.cmd, pos: o.pos, val: o.val }; });
         
-        opsA.reverse().forEach(function(opA) {
+        opsA.sort(opsCompare).reverse().forEach(function(opA) {
             opsB_.forEach(function(opB) {
                 if(opB.pos < opA.pos) { return; }
                 
@@ -44,7 +51,9 @@
                     else if(opB.cmd === "del" && opA.cmd === "ins") { opB.pos += opA.val.length; }
                     else if(opB.cmd === "ins" && opA.cmd === "del") { /* no-op */ }
                     else if(opB.cmd === "ins" && opA.cmd === "ins") {
-                        if(opB.val < opA.val) { opB.pos += opA.val.length; } else { /* no-op */ }
+                        if(opB.val === opA.val) { /* no-op */ }
+                        else if([opB.val, opA.val].sort()[0] === opA.val) { opB.pos += opA.val.length; } 
+                        else { /* no-op */ }
                     }
                 }
             });
