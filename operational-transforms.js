@@ -13,7 +13,7 @@
         
         opsB = opsB.map(function(o) { return { cmd: o.cmd, pos: o.pos, val: o.val }; });
         opsA.forEach(function(a) { // Compensatings for the affects of opsA on opsB
-            opsB.forEach(function(b) { // Compensative changes opsB_ for
+            opsB.forEach(function(b) {
                 if(a.pos <= b.pos) { b.pos += (a.cmd === "ins" ? -a.val.length : 1); }
             });
         });
