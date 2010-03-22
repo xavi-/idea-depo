@@ -1,0 +1,38 @@
+<html>
+<head>
+</head>
+<body>
+    <textarea rows="20" cols="80">hello</textarea>
+<div id="diff-bin">
+</div>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js" type="text/javascript"></script>
+<script src="/client.js" type="text/javascript"></script>
+<script src="/operational-transforms.js"></script>
+<script>
+(function() {
+    var ch = new Channel("ot");
+    var curText = $("textarea").val();
+    
+    $("textarea").keyup(function() {
+        var newText = $("textarea").val();
+        var op = ot.produceOp(curText, newText);
+        
+        if(op.length <= 0) { return; }
+        
+        $("#diff-bin").append(JSON.stringify(op));
+        
+        ch.send(op);
+        
+        curText = newText;
+    });
+    
+    ch.onReceive(function(msg) {
+        curText = ot.applyOp(curText, msg.content);
+        $("textarea").val(curText);
+    });
+    
+    ch.start();
+})();
+</script>
+</body>
+</html>
