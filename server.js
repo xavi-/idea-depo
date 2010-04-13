@@ -10,8 +10,7 @@ var srv = (function() {
             var body = "404'd";
             res.sendHeader(404, { "Content-Length": body.length,
                                   "Content-Type": "text/plain" });
-            res.write(body);
-            res.close();
+            res.end(body);
             
             sys.puts("Someone 404'd: " + req.url);
         };
@@ -38,8 +37,7 @@ var StaticFileHandler = (function() {
             
             res.sendHeader(200, { "Conent-Length": data.length,
                                   "Content-Type": mime });
-            res.write(data, "utf8");
-            res.close();
+            res.end(data, "utf8");
         });
     }
 
@@ -72,8 +70,7 @@ var chn = (function() {
                                   "Content-Type": "application/json",
                                   "Cache-Control": "no-cache",
                                   "Set-Cookie": userId  + "; path=/;"});
-            res.write(body);
-            res.close();
+            res.end(body);
         }
         
         return function Channel(id) {
@@ -197,8 +194,7 @@ var chn = (function() {
                                       "Content-Type": "text/plain",
                                       "Cache-Control": "no-cache",
                                       "Set-Cookie": userId + "; path=/;"});
-                res.write(infoId);
-                res.close();
+                res.end(infoId);
             }
         });
     })();
