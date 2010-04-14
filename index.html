@@ -2,7 +2,7 @@
 <head>
 </head>
 <body>
-    <textarea rows="20" cols="80">hello</textarea>
+    <textarea rows="20" cols="80">(:text:)</textarea>
 <div id="diff-bin">
 </div>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js" type="text/javascript"></script>
@@ -10,7 +10,7 @@
 <script src="/operational-transforms.js" type="text/javascript"></script>
 <script>
 (function() {
-    var ch = new Channel("ot");
+    var ch = new Channel("(:channel-name ~ ot:)", (:initial-info-id ~ 0:));
     var curText = $("textarea").val();
     
     $("textarea").keyup(function() {

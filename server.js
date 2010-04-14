@@ -2,6 +2,7 @@ var sys = require("sys");
 var http = require("http");
 var url = require("url");
 var fs = require("fs");
+var bind = require("./libraries/bind-js/bind");
 
 var srv = (function() {
     var urls = {},
@@ -46,7 +47,19 @@ var StaticFileHandler = (function() {
     };
 })();
 
-srv.urls["/"] = srv.urls["/index.html"] = StaticFileHandler("./index.html", "text/html");
+srv.urls["/"] = srv.urls["/index.html"] = function(req, res) {
+    fs.readFile("./index.html", function(err, data) {
+        if(err) { throw err; };
+        var lastInfoId = (chn.channels["www"] || { lastInfoId: 0}).lastInfoId;
+        var context = { text: text, "channel-name": "www", "initial-info-id": lastInfoId };
+        
+        bind.to(data, context, function(data) {
+            res.sendHeader(200, { "Conent-Length": data.length,
+                                  "Content-Type": "text/html" });
+            res.end(data, "utf8");
+        });
+    });
+};
 
 srv.urls["/operational-transforms.js"] = StaticFileHandler("./operational-transforms.js",  "application/x-javascript");
 
@@ -79,6 +92,8 @@ var chn = (function() {
             this.id = id;
             
             this.data = [];
+            
+            this.lastInfoId = 0;
             
             this.users = function() { return users; };
             
@@ -122,7 +137,8 @@ var chn = (function() {
                     responses.forEach(function(o) { sendJSON(o.userId, newInfo, o.response); });
                     responses = [];
                 }
-                    
+                
+                this.lastInfoId = lastInfoId
                 return lastInfoId;
             };
             
@@ -220,3 +236,13 @@ var chn = (function() {
     
     return { channels: channels, onCreate: function(callback) { _onCreate.push(callback); } };
 })();
+
+var ot = require("./operational-transforms");
+    var text = "";
+chn.onCreate(function(id, channel) {
+    
+    channel.onReceive(function(msg, sendMoreInfo) {
+        text = ot.applyOp(text, msg.content);
+        sys.puts("text: " + text);
+    });
+});

@@ -3,8 +3,8 @@
         return window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest(); 
     }
     
-    function Channel(id) {
-        var onreceive = [], lastInfoId = 0;
+    function Channel(id, initInfo) {
+        var onreceive = [], lastInfoId = initInfo || 0;
         
         function listen() {        
             var client = xhr(),
