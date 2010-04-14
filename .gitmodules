@@ -1,0 +1,3 @@
+[submodule "libraries/bind-js"]
+	path = libraries/bind-js
+	url = git://github.com/Xavi-/bind-js.git
