@@ -50,8 +50,8 @@ var StaticFileHandler = (function() {
 srv.urls["/"] = srv.urls["/index.html"] = function(req, res) {
     fs.readFile("./index.html", function(err, data) {
         if(err) { throw err; };
-        var lastInfoId = (chn.channels["www"] || { lastInfoId: 0}).lastInfoId;
-        var context = { text: text, "channel-name": "www", "initial-info-id": lastInfoId };
+        var channel = chn.channels["www"] || { text: "", lastInfoId: 0};
+        var context = { text: channel.text, "channel-name": "www", "initial-info-id": channel.lastInfoId };
         
         bind.to(data, context, function(data) {
             res.sendHeader(200, { "Conent-Length": data.length,
@@ -65,6 +65,27 @@ srv.urls["/operational-transforms.js"] = StaticFileHandler("./operational-transf
 
 srv.urls["/client.js"] = StaticFileHandler("./client.js", "application/x-javascript");
 
+(function() {
+    var regChannel = new RegExp("^/([a-zA-Z0-9_-]+)$");
+    srv.patterns.push({
+        test: function(req) { return regChannel.test(url.parse(req.url).pathname); },
+        handler: function(req, res) { 
+            var channelId = regChannel.exec(url.parse(req.url).pathname)[1];
+            sys.puts("matched: " + req.url);
+            fs.readFile("./index.html", function(err, data) {
+                if(err) { throw err; };
+                var channel = chn.channels[channelId] || { text: "", lastInfoId: 0};
+                var context = { text: channel.text, "channel-name": channelId, "initial-info-id": channel.lastInfoId };
+                
+                bind.to(data, context, function(data) {
+                    res.sendHeader(200, { "Conent-Length": data.length,
+                                          "Content-Type": "text/html" });
+                    res.end(data, "utf8");
+                });
+            });
+        }
+    });
+})()
 
 // /channel/<session-id>/send?msg=<json> => returns an info-id
 // /channel/<session-id>/read?info-id=<int-id> => returns a list of json messages
@@ -238,11 +259,11 @@ var chn = (function() {
 })();
 
 var ot = require("./operational-transforms");
-    var text = "";
 chn.onCreate(function(id, channel) {
+    channel.text = "";
     
     channel.onReceive(function(msg, sendMoreInfo) {
-        text = ot.applyOp(text, msg.content);
-        sys.puts("text: " + text);
+        channel.text = ot.applyOp(channel.text, msg.content);
+        sys.puts("text: " + channel.text);
     });
 });
