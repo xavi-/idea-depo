@@ -6,6 +6,8 @@ var bind = require("./libraries/bind-js/bind");
 
 var DEPO_DIR = "./depos/"
 
+fs.mkdir(DEPO_DIR, 0666);
+
 var srv = (function() {
     var urls = {},
         patterns = [],
@@ -84,7 +86,7 @@ srv.urls["/operational-transforms.js"] = StaticFileHandler("./operational-transf
 
 srv.urls["/client.js"] = StaticFileHandler("./client.js", "application/x-javascript");
 
-srv.urls["/"] = srv.urls["/index.html"] = srv.urls["/index"] = function(req, res) { sendChannel(res, "index"); };
+srv.urls["/"] = srv.urls["/index.html"] = function(req, res) { sendChannel(res, "index"); };
 (function() {
     var regChannel = new RegExp("^/([a-zA-Z0-9_-]+)$");
     srv.patterns.push({
@@ -288,7 +290,9 @@ chn.onCreate(function(id, channel) {
     
     channel.onload = new Event(channel);
     
-    fs.readFile(DEPO_DIR + id, function(err, text) { sys.puts("read file: " + id);
+    fs.readFile(DEPO_DIR + id, function(err, text) {
+        sys.puts("Read in file: " + id);
+        
         if(err) { text = ""; }
         
         channel.text = text;
@@ -298,10 +302,7 @@ chn.onCreate(function(id, channel) {
     
     channel.onReceive(function(msg, sendMoreInfo) { // TODO: handle case were messages come in while reading in file
         channel.text = ot.applyOp(channel.text, msg.content);
-        sys.puts("text: " + channel.text);
         
-        fs.writeFile(DEPO_DIR + id, channel.text, function(err) {
-            if(err) { throw err; } else { sys.puts("wrote file: " + id); }
-        });
+        fs.writeFile(DEPO_DIR + id, channel.text, function(err) { if(err) { throw err; } });
     });
 });
