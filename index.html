@@ -19,8 +19,6 @@
         
         if(op.length <= 0) { return; }
         
-        $("#diff-bin").append(JSON.stringify(op));
-        
         ch.send(op);
         
         curText = newText;
