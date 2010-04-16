@@ -302,9 +302,21 @@ chn.onCreate(function(id, channel) {
         delete channel.onload;
     });
     
+    var writeInFlight = false;
+    
     channel.onReceive(function(msg, sendMoreInfo) { // TODO: handle case were messages come in while reading in file
         channel.text = ot.applyOp(channel.text, msg.content);
         
-        fs.writeFile(DEPO_DIR + id, channel.text, function(err) { if(err) { throw err; } });
+        if(!writeInFlight) {
+            setTimeout(function() {
+                fs.writeFile(DEPO_DIR + id, channel.text, function(err) {
+                    if(err) { throw err; }
+                    
+                    sys.puts("Wrote: " + id);
+                    writeInFlight = false; 
+                });
+            }, 1000);
+            writeInFlight = true;
+        }
     });
 });
