@@ -4,6 +4,8 @@ var url = require("url");
 var fs = require("fs");
 var bind = require("./libraries/bind-js/bind");
 
+var DEPO_DIR = "./depos/"
+
 var srv = (function() {
     var urls = {},
         patterns = [],
@@ -47,42 +49,49 @@ var StaticFileHandler = (function() {
     };
 })();
 
-srv.urls["/"] = srv.urls["/index.html"] = function(req, res) {
-    fs.readFile("./index.html", function(err, data) {
-        if(err) { throw err; };
-        var channel = chn.channels["www"] || { text: "", lastInfoId: 0};
-        var context = { text: channel.text, "channel-name": "www", "initial-info-id": channel.lastInfoId };
-        
+var sendChannel = (function() {
+    function bindAndSend(res, data, context) {
         bind.to(data, context, function(data) {
             res.sendHeader(200, { "Conent-Length": data.length,
                                   "Content-Type": "text/html" });
             res.end(data, "utf8");
         });
-    });
-};
+    }
+    
+    return function sendChannel(res, channelId) {
+        fs.readFile("./index.html", function(err, data) {
+            if(err) { throw err; };
+            
+            var context, channel = chn.channels[channelId];
+            
+            if(!channel) {
+                context = { text: "", "channel-name": channelId, "initial-info-id": 0 };
+                chn.create(channelId).onload.add(function(text) {
+                    context["text"] = text;
+                    
+                    bindAndSend(res, data, context);
+                });
+            }
+            else {
+                context = { text: channel.text, "channel-name": channelId, "initial-info-id": channel.lastInfoId };
+                bindAndSend(res, data, context); 
+            }
+        });
+    };
+})();
 
 srv.urls["/operational-transforms.js"] = StaticFileHandler("./operational-transforms.js",  "application/x-javascript");
 
 srv.urls["/client.js"] = StaticFileHandler("./client.js", "application/x-javascript");
 
+srv.urls["/"] = srv.urls["/index.html"] = srv.urls["/index"] = function(req, res) { sendChannel(res, "index"); };
 (function() {
     var regChannel = new RegExp("^/([a-zA-Z0-9_-]+)$");
     srv.patterns.push({
         test: function(req) { return regChannel.test(url.parse(req.url).pathname); },
         handler: function(req, res) { 
             var channelId = regChannel.exec(url.parse(req.url).pathname)[1];
-            sys.puts("matched: " + req.url);
-            fs.readFile("./index.html", function(err, data) {
-                if(err) { throw err; };
-                var channel = chn.channels[channelId] || { text: "", lastInfoId: 0};
-                var context = { text: channel.text, "channel-name": channelId, "initial-info-id": channel.lastInfoId };
-                
-                bind.to(data, context, function(data) {
-                    res.sendHeader(200, { "Conent-Length": data.length,
-                                          "Content-Type": "text/html" });
-                    res.end(data, "utf8");
-                });
-            });
+            sendChannel(res, channelId);
         }
     });
 })()
@@ -255,15 +264,44 @@ var chn = (function() {
         });
     })();
     
-    return { channels: channels, onCreate: function(callback) { _onCreate.push(callback); } };
+    function create(id) {
+        channels[id] = channels[id] || (new Channel(id));
+        return channels[id];
+    }
+    
+    return { channels: channels, create: create, onCreate: function(callback) { _onCreate.push(callback); } };
 })();
+
+function Event(ctx) {
+    var listeners = [];
+    
+    this.add = function(listener) { listeners.push(listener); return this; };
+    
+    this.trigger = function trigger(e) {
+        for(var i = 0; i < listeners.length; i++) { listeners[i].call(ctx, e, ctx); }
+    };
+}
 
 var ot = require("./operational-transforms");
 chn.onCreate(function(id, channel) {
     channel.text = "";
     
-    channel.onReceive(function(msg, sendMoreInfo) {
+    channel.onload = new Event(channel);
+    
+    fs.readFile(DEPO_DIR + id, function(err, text) { sys.puts("read file: " + id);
+        if(err) { text = ""; }
+        
+        channel.text = text;
+        
+        channel.onload.trigger(text);
+    });
+    
+    channel.onReceive(function(msg, sendMoreInfo) { // TODO: handle case were messages come in while reading in file
         channel.text = ot.applyOp(channel.text, msg.content);
         sys.puts("text: " + channel.text);
+        
+        fs.writeFile(DEPO_DIR + id, channel.text, function(err) {
+            if(err) { throw err; } else { sys.puts("wrote file: " + id); }
+        });
     });
 });
