@@ -298,6 +298,8 @@ chn.onCreate(function(id, channel) {
         channel.text = text;
         
         channel.onload.trigger(text);
+        
+        delete channel.onload;
     });
     
     channel.onReceive(function(msg, sendMoreInfo) { // TODO: handle case were messages come in while reading in file
