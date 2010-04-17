@@ -30,7 +30,7 @@ var srv = (function() {
         
     http.createServer(function(req, res) {
         (urls[url.parse(req.url).pathname] || findPattern(req) || error)(req, res);
-    }).listen(8000);
+    }).listen(8001);
     
     return { urls: urls, patterns: patterns, error: error };
 })();
