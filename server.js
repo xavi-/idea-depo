@@ -97,4 +97,5 @@ chn.onCreate(function(id, channel) {
     });
 });
 
+srv.server.listen(8001);
 chn.start(srv);
