@@ -1,6 +1,6 @@
 [submodule "libraries/bind-js"]
 	path = libraries/bind-js
 	url = git://github.com/Xavi-/bind-js.git
-[submodule "libraries\\xavlib"]
-	path = libraries\\xavlib
+[submodule "libraries/xavlib"]
+	path = libraries/xavlib
 	url = git://github.com/Xavi-/xavlib.git
