@@ -1,7 +1,7 @@
 var sys = require("sys");
 var url = require("url");
 var fs = require("fs");
-var bind = require("./libraries/bind-js/bind");
+var bind = require("./libraries/bind-js");
 
 var DEPO_DIR = "./depos/"
 
@@ -26,7 +26,7 @@ var sendChannel = (function() {
             
             if(!channel) {
                 context = { text: "", "channel-name": channelId, "initial-info-id": 0 };
-                chn.create(channelId).onload.add(function(text) {
+                chn.create(channelId).onload(function(text) {
                     context["text"] = text;
                     
                     bindAndSend(res, data, context);
@@ -59,12 +59,12 @@ srv.urls["/"] = srv.urls["/index.html"] = function(req, res) { sendChannel(res, 
 // /channel/<session-id>/send?msg=<json> => returns an info-id
 // /channel/<session-id>/read?info-id=<int-id> => returns a list of json messages
 var chn = require("./libraries/xavlib/channel");
-var Event = require("./libraries/xavlib/event").Event;
+var event = require("./libraries/xavlib/event");
 var ot = require("./operational-transforms");
 chn.onCreate(function(id, channel) {
     channel.text = "";
     
-    channel.onload = new Event(channel);
+    channel.onload = event.create(channel);
     
     fs.readFile(DEPO_DIR + id, function(err, text) {
         sys.puts("Read in file: " + id);
