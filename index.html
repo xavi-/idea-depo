@@ -8,7 +8,7 @@
         margin: 0px;;
     }
     
-    textarea {
+    textarea#text {
         position: absolute;
         height: 100%;
         width: 100%;
@@ -23,19 +23,19 @@
 </style>
 </head>
 <body>
-    <textarea>(:text:)</textarea>
+    <textarea id="text">(:text:)</textarea>
 <div id="diff-bin">
 </div>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js" type="text/javascript"></script>
 <script src="/client.js" type="text/javascript"></script>
 <script src="/operational-transforms.js" type="text/javascript"></script>
 <script>
 (function() {
     var ch = new Channel("(:channel-name ~ ot:)", (:initial-info-id ~ 0:));
-    var curText = $("textarea").val();
+    var text = document.getElementById("text");
+    var curText = text.value;
     
-    $("textarea").keyup(function() {
-        var newText = $("textarea").val();
+    text.addEventListener('keyup', function() {
+        var newText = text.value;
         var op = ot.produceOp(curText, newText);
         
         if(op.length <= 0) { return; }
@@ -43,11 +43,11 @@
         ch.send(op);
         
         curText = newText;
-    });
-    
+    }, false);
+        
     ch.onReceive(function(msg) {
         curText = ot.applyOp(curText, msg.content);
-        $("textarea").val(curText);
+        text.value = curText;
     });
     
     ch.start();
