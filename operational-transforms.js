@@ -76,16 +76,32 @@
     }
     
     var produceOp = (function() {
-        function lcs(textA, textB) { // TODO: improve performance with dynamic version of algorithm or memoization
-            if(textA === "" || textB === "") { return ""; }
-            else if(textA[0] === textB[0]) { return textA[0] + lcs(textA.substr(1), textB.substr(1)); }
-            else {
-                var ans1 = lcs(textA, textB.substr(1));
-                var ans2 = lcs(textA.substr(1), textB);
-                
-                return (ans1.length > ans2.length ? ans1 : ans2);
+        var lcs = (function() {
+            var cache = {};
+            
+            function lcs(textA, textB) { // TODO: improve performance with dynamic version of algorithm or memoization
+                if(textA === "" || textB === "") { return ""; }
+                else if(textA[0] === textB[0]) { return textA[0] + cached_lcs(textA.substr(1), textB.substr(1)); }
+                else {
+                    var ans1 = cached_lcs(textA, textB.substr(1));
+                    var ans2 = cached_lcs(textA.substr(1), textB);
+                    
+                    return (ans1.length > ans2.length ? ans1 : ans2);
+                }
             }
-        }
+            
+            function cached_lcs(textA, textB) {
+                if(!cache[textA]) { cache[textA] = {}; }
+                if(!cache[textA][textB]) { cache[textA][textB] = lcs(textA, textB); }
+                
+                return cache[textA][textB];
+            }
+            
+            return function public_lcs(textA, textB) { 
+                cache = {};
+                return cached_lcs(textA, textB); 
+            }
+        })();
     
         function trim(textA, textB) {
             for(var i = 0, l = Math.min(textA.length, textB.length); i < l; i++) {
