@@ -34,7 +34,7 @@
     var text = document.getElementById("text");
     var curText = text.value;
     
-    text.addEventListener('keyup', function() {
+    function sendChanges() {
         var newText = text.value;
         var op = ot.produceOp(curText, newText);
         
@@ -43,8 +43,12 @@
         ch.send(op);
         
         curText = newText;
-    }, false);
-        
+    }
+    
+    text.addEventListener('keyup', sendChanges, false);
+    text.addEventListener('mouseup', sendChanges, false);
+    text.addEventListener('input', sendChanges, false);
+    
     ch.onReceive(function(msg) {
         curText = ot.applyOp(curText, msg.content);
         text.value = curText;
