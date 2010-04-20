@@ -44,6 +44,8 @@ srv.urls["/operational-transforms.js"] = srv.staticFileHandler("./operational-tr
 
 srv.urls["/client.js"] = srv.staticFileHandler("./libraries/xavlib/channel/client.js", "application/x-javascript");
 
+srv.urls["/json2.js"] = srv.staticFileHandler("./libraries/json2.js", "application/x-javascript");
+
 srv.urls["/"] = srv.urls["/index.html"] = function(req, res) { sendChannel(res, "index"); };
 (function() {
     var regChannel = new RegExp("^/([a-zA-Z0-9_-]+)$");
