@@ -161,8 +161,84 @@
         return produceOp;
     })();
     
+    function Client(text, firstId, send) {
+        var ops = [];
+        var canSend = true;
+        var unackOp = [];
+        var toSendOp = [];
+        
+        function _send() {
+            if(toSendOp <= 0) { return; }
+            
+            canSend = false;
+            unackOp = toSendOp;           
+            var lastId = firstId + ops.length;
+            send(lastId, unackOp, function(ops) {
+                for(var i = 0; i < ops.length; i++) { this.addOp.fromServer(lastId + i, ops[i]); }
+                ops.push(unackOp);
+                
+                unackOp = [];
+                canSend = true;
+                setTimeout(_send, 0);
+            });
+            
+            toSendOp = [];
+        }
+        
+        this.addOp = {};
+        this.addOp.fromClient = function fromClient(op) {
+            if(op.length <= 0) { return; }
+            
+            text = ot.applyOp(text, op);
+            toSendOp = ot.combine(toSendOp, op);
+            
+            if(canSend) { _send(); }
+        };
+        this.addOp.fromServer = function fromServer(id, op) {
+            if(id <= firstId + ops.length) { return; }
+            
+            localOp = ot.transform(toSendOp, ot.transform(unackOp, op));
+            text = ot.applyOp(text, localOp);
+            toSendOp = ot.transform(op, toSendOp);
+            
+            ops.push(op);
+            
+            return text;
+        };
+        
+        this.text = function() { return text; };
+    }
+    
+    function Server(text, firstId, broadcast) {
+        var ops = [];
+        
+        this.addOp = function(relativeId, op, reply) {
+            var rtnOps = [];
+            
+            if(relativeId < firstId) { return; }
+            
+            for(var i = relativeId - firstId + 1; i < ops.length; i++) {
+                op = ot.transform(ops[i], op);
+                rtnOps.push(ops[i]);
+            }
+            
+            ops.push(op);
+            
+            text = ot.apply(text, op);
+            
+            reply(rtnOps);
+            broadcast(op);
+            
+            return rtnOps;
+        };
+        
+        this.text = function() { return text; };
+    }
+    
     ot.combine = combine;
     ot.transform = transform;
     ot.applyOp = applyOp;
     ot.produceOp = produceOp;
+    ot.Client = Client;
+    ot.Server = Server;
 })(typeof exports === "object" ? exports : (window.ot = {}));

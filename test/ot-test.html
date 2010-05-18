@@ -77,6 +77,14 @@
                           [ { cmd: "ins", pos: 3, val: "woop" }, { cmd: "del", pos: 5 } ]),
              [ { cmd: "ins", pos: 2, val: "woop" }, { cmd: "del", pos: 8, val: undefined } ],
              "Edge case transform test");
+        
+        same(ot.transform([ { cmd: "ins", pos: 5, val: "o" } ], [ { cmd: "ins", pos: 5, val: " world" } ]),
+             [ { cmd: "ins", pos: 5, val: " world" } ],
+             "Inserts near each other don't work");
+             
+        same(ot.transform([ { cmd: "ins", pos: 5, val: " world" } ], [ { cmd: "ins", pos: 5, val: "o" } ]),
+             [ { cmd: "ins", pos: 11, val: "o" } ],
+             "Inserts near each other don't work");
     });
     
     test("producing operations: simple tests", function() {
@@ -90,11 +98,15 @@
         
         same(ot.produceOp("hello", "helkaklo"), [ { cmd: "ins", pos: 3, val: "kak" } ], "Insert at begin middle");
         
-        same(ot.produceOp("helklo", "hello"), [ { cmd: "del", pos: 3 } ], "Delete at begin middle");
+        same(ot.produceOp("helklo", "hello"), [ { cmd: "del", pos: 3 } ], "Delete at middle");
     });
     
     test("combine operations integrated tests", function() {
         var opsA, opsB;
+        
+        opsA = [];
+        opsB = ot.produceOp("hi", "hide");
+        same(ot.combine(opsA, opsB), ot.produceOp("hi", "hide"), "combining with a null op");
         
         opsA = ot.produceOp("hi", "hid");
         opsB = ot.produceOp("hid", "hide");
@@ -164,6 +176,36 @@
         equals(ot.applyOp("012", opsA), "-2-1012345");
         equals(ot.applyOp(ot.applyOp("012", opsA), ot.transform(opsA, opsB)), "-2-10123456789");
         equals(ot.applyOp(ot.applyOp("012", opsB), ot.transform(opsB, opsA)), "-2-10123456789");
+    });
+    
+    test("Test OT Client", function() {
+        var sentOps = [];
+        
+        var send = (function() {
+            var pendingCallback;
+            
+            function send(lastId, op, callback) {
+                sentOps.push(op);
+                pendingCallback = callback;
+            }
+            
+            send.ack = function(ops) {
+                pendingCallback(ops);
+            };
+            
+            return send;
+        })();
+        
+        var client = new ot.Client("hello", 5, send);
+        
+        client.addOp.fromClient([ { cmd: "ins", pos: 5, val: "o" } ]);
+        client.addOp.fromServer(7, [ { cmd: "ins", pos: 5, val: " world" } ]);
+        send.ack([]);
+        
+        equals("hello worldo", client.text());
+    });
+    
+    test("Test OT Server", function() {
     });
 </script>
 </body>
