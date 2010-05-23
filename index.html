@@ -56,7 +56,7 @@
         text.value = curText;
     });
     
-    ch.start();
+    window.addEventListener("load", function() { setTimeout(function() { ch.start(); }, 0) });
 })();
 </script>
 </body>
