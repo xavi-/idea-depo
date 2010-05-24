@@ -45,6 +45,17 @@
         ch.send(op);
         
         curText = newText;
+        
+        if(op.length === 1 && op[0].val === "\n") {
+            var curPos = text.selectionStart;
+            var spaces = curText.substring(curText.lastIndexOf("\n", curPos - 2), curPos - 1).match(/^\n+(\s*)/)[1];
+            
+            if(spaces.length === 0) { return; }
+            
+            text.value = curText.substr(0, curPos) + spaces + curText.substr(curPos);
+            sendChanges();
+            text.selectionStart = text.selectionEnd = curPos + spaces.length;
+        }
     }
     
     text.addEventListener('keyup', sendChanges, false);
