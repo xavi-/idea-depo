@@ -12,7 +12,7 @@ var srv = require("./libraries/xavlib/simple-router");
 var sendChannel = (function() {
     function bindAndSend(res, data, context) {
         bind.to(data, context, function(data) {
-            res.sendHeader(200, { "Conent-Length": data.length,
+            res.writeHead(200, { "Conent-Length": data.length,
                                   "Content-Type": "text/html" });
             res.end(data, "utf8");
         });
@@ -73,7 +73,7 @@ chn.onCreate(function(id, channel) {
         
         if(err) { text = ""; }
         
-        channel.text = text;
+        channel.text = text.toString();
         
         channel.onload.trigger(text);
         
