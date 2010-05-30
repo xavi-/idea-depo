@@ -59,9 +59,13 @@
         
         if(spaces.length === 0) { return; }
         
+        var scroll = text.scrollTop;
+        
         text.value = curText.substr(0, curPos) + spaces + curText.substr(curPos);
         sendChanges();
+        
         text.selectionStart = text.selectionEnd = curPos + spaces.length;
+        text.scrollTop = scroll;
     }, false);
     text.addEventListener('keydown', function(e) { // Making [tab] work
         if(e.which !== 9) { return; }
