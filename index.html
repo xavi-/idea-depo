@@ -63,6 +63,20 @@
         sendChanges();
         text.selectionStart = text.selectionEnd = curPos + spaces.length;
     }, false);
+    text.addEventListener('keydown', function(e) { // Making [tab] work
+        if(e.which !== 9) { return; }
+
+        var curPos = text.selectionStart;
+
+        text.value = curText.substr(0, curPos) + "  " + curText.substr(curPos);
+        sendChanges();
+        text.selectionStart = text.selectionEnd = curPos + 2;
+
+        e.stopPropagation();
+        e.preventDefault();
+
+        return false;
+    }, false);
     
     ch.onReceive(function(msg) {
         curText = ot.applyOp(curText, msg.content);
