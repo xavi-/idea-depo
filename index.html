@@ -55,7 +55,7 @@
         if(e.which !== 13) { return; }
         
         var curPos = text.selectionStart;
-        var spaces = curText.substring(curText.lastIndexOf("\n", curPos - 2), curPos - 1).match(/^\n+(\s*)/)[1];
+        var spaces = curText.substring(curText.lastIndexOf("\n", curPos - 2), curPos - 1).match(/^\n*(\s*)/)[1];
         
         if(spaces.length === 0) { return; }
         
