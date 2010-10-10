@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="viewport" content="initial-scale=1.0; minimum-scale=1.0; maximum-scale=1.0; width=device-width; user-scalable=no;"/>
 <title>idea-depo: (:channel-name ~ index:)</title>
 <style>
     html, body {
@@ -11,7 +12,7 @@
     
     textarea#text {
         position: absolute;
-        height: 100%;
+        min-height: 100%;
         width: 100%;
         border: none;
         margin: 0px;
@@ -48,9 +49,18 @@
         curText = newText;
     }
     
+    function adjustHeight() {   
+        text.style.setProperty("height", text.scrollHeight + "px", null);
+    }
+    
     text.addEventListener('keyup', sendChanges, false);
     text.addEventListener('mouseup', sendChanges, false);
     text.addEventListener('input', sendChanges, false);
+    
+    text.addEventListener('keyup', adjustHeight, false);
+    text.addEventListener('mouseup', adjustHeight, false);
+    text.addEventListener('input', adjustHeight, false);
+    
     text.addEventListener('keyup', function(e) { // Hanging tabs
         if(e.which !== 13) { return; }
         
@@ -85,9 +95,11 @@
     ch.onReceive(function(msg) {
         curText = ot.applyOp(curText, msg.content);
         text.value = curText;
+        adjustHeight();
     });
     
     window.addEventListener("load", function() { setTimeout(function() { ch.start(); }, 0) }, false);
+    adjustHeight();
 })();
 </script>
 </body>
