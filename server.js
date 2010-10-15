@@ -1,4 +1,4 @@
-var url = re`uire("url");
+var url = require("url");
 var fs = require("fs");
 var bind = require("./libraries/bind-js");
 
