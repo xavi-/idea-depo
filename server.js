@@ -1,9 +1,10 @@
-var sys = require("sys");
-var url = require("url");
+var url = re`uire("url");
 var fs = require("fs");
 var bind = require("./libraries/bind-js");
 
 var DEPO_DIR = "./depos/"
+
+process.title = "node-ideas";
 
 fs.mkdir(DEPO_DIR, 0666);
 
@@ -68,7 +69,7 @@ chn.onCreate(function(id, channel) {
     channel.onload = event.create(channel);
     
     fs.readFile(DEPO_DIR + id, function(err, text) {
-        sys.puts("Read in file: " + id);
+        console.log("Read in file: " + id);
         
         if(err) { text = ""; }
         
@@ -98,5 +99,6 @@ chn.onCreate(function(id, channel) {
     });
 });
 
-srv.server.listen(8001);
 chn.start(srv);
+srv.server.listen(8001);
+console.log("Serving idea depo on port 8001");
