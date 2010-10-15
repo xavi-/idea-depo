@@ -40,10 +40,9 @@ var sendChannel = (function() {
     };
 })();
 
-srv.urls["/operational-transforms.js"] = srv.staticFileHandler("./operational-transforms.js", "application/x-javascript");
-
+srv.urls["/operational-transforms.js"] = 
+    srv.staticFileHandler("./operational-transforms.js", "application/x-javascript");
 srv.urls["/client.js"] = srv.staticFileHandler("./libraries/xavlib/channel/client.js", "application/x-javascript");
-
 srv.urls["/json2.js"] = srv.staticFileHandler("./libraries/json2.js", "application/x-javascript");
 
 srv.urls["/"] = srv.urls["/index.html"] = function(req, res) { sendChannel(res, "index"); };
@@ -75,7 +74,7 @@ chn.onCreate(function(id, channel) {
         
         channel.text = text.toString();
         
-        channel.onload.trigger(text);
+        channel.onload.trigger(channel.text);
         
         delete channel.onload;
     });
