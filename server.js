@@ -90,7 +90,7 @@ chn.onCreate(function(id, channel) {
                 fs.writeFile(DEPO_DIR + id, channel.text, function(err) {
                     if(err) { throw err; }
                     
-                    sys.puts("Wrote: " + id);
+                    console.log("Wrote: " + id);
                     writeInFlight = false; 
                 });
             }, 1000);
