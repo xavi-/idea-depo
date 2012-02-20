@@ -5,8 +5,10 @@
     }
 
     /*
-     * Both opsA ad opsB are arries of this form:
+     * Both opsA ad opsB are arrays of this form:
      *   [ { cmd: "ins", pos: <number>, val: <val> }, { cmd: "del", pos: <number> } ... ]
+     * 
+     * Combine assumes opsA comes before opsB
      */
     function combine(opsA, opsB) {
         var a = 0, b = 0, opC = [];
@@ -117,7 +119,7 @@
         }
         
         function produceOp(oriText, newText) {
-            var trm = trim(oriText, newText);
+            var trm = trim(oriText.trimRight(), newText.trimRight());
             
             if(trm.A === "" && trm.B === "") { return []; }
             else if(trm.A === "") { return [ { cmd: "ins", pos: trm.frontOffset, val: trm.B } ]; }
